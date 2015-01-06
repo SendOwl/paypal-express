@@ -31,7 +31,6 @@ module Paypal
           :"PAYMENTREQUEST_#{index}_CURRENCYCODE" => self.currency_code,
           :"PAYMENTREQUEST_#{index}_DESC" => self.description,
           :"PAYMENTREQUEST_#{index}_INVNUM" => self.invoice_number,
-          :"PAYMENTREQUEST_#{index}_CUSTOM" => self.custom,
           :"PAYMENTREQUEST_#{index}_SHIPTONAME" => self.ship_name,
           :"PAYMENTREQUEST_#{index}_SHIPTOSTREET" => self.ship_street,
           :"PAYMENTREQUEST_#{index}_SHIPTOSTREET2" => self.ship_street2,
@@ -48,7 +47,13 @@ module Paypal
           # FOR PARALLEL PAYMENT
           :"PAYMENTREQUEST_#{index}_PAYMENTREQUESTID" => self.request_id,
           :"PAYMENTREQUEST_#{index}_SELLERPAYPALACCOUNTID" => self.seller_id
-        }.delete_if do |k, v|
+        }
+        if self.billing_type
+          params[:"L_BILLINGAGREEMENTCUSTOM#{index}"] = self.custom
+        else
+          params[:"PAYMENTREQUEST_#{index}_CUSTOM"] = self.custom
+        end
+        params.delete_if do |k, v|
           v.blank?
         end
         if self.items.present?
