@@ -26,8 +26,6 @@ module Paypal
         params = {
           :"PAYMENTREQUEST_#{index}_PAYMENTACTION" => self.action,
           :"PAYMENTREQUEST_#{index}_AMT" => Util.formatted_amount(self.amount.total),
-          :"PAYMENTREQUEST_#{index}_TAXAMT" => Util.formatted_amount(self.amount.tax),
-          :"PAYMENTREQUEST_#{index}_SHIPPINGAMT" => Util.formatted_amount(self.amount.shipping),
           :"PAYMENTREQUEST_#{index}_CURRENCYCODE" => self.currency_code,
           :"PAYMENTREQUEST_#{index}_DESC" => self.description,
           :"PAYMENTREQUEST_#{index}_INVNUM" => self.invoice_number,
@@ -48,6 +46,12 @@ module Paypal
           :"PAYMENTREQUEST_#{index}_PAYMENTREQUESTID" => self.request_id,
           :"PAYMENTREQUEST_#{index}_SELLERPAYPALACCOUNTID" => self.seller_id
         }
+        if self.amount.tax
+          params[:"PAYMENTREQUEST_#{index}_TAXAMT"] = Util.formatted_amount(self.amount.tax)
+        end
+        if self.amount.shipping
+          params[:"PAYMENTREQUEST_#{index}_SHIPPINGAMT"] = Util.formatted_amount(self.amount.shipping)
+        end
         if self.billing_type
           params[:"L_BILLINGAGREEMENTCUSTOM#{index}"] = self.custom
         else
