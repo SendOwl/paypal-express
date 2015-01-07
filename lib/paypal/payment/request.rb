@@ -2,7 +2,7 @@ module Paypal
   module Payment
     class Request < Base
       attr_optional :action, :currency_code, :description, :notify_url, :billing_type, :billing_agreement_description, :billing_agreement_id, :request_id, :seller_id, :invoice_number, :custom, :ship_name, :ship_street, :ship_street2, :ship_city, :ship_state, :ship_zip, :ship_country_code
-      attr_accessor :amount, :items, :custom_fields
+      attr_accessor :amount, :items, :custom_fields, :shipping_present, :tax_present
 
       def initialize(attributes = {})
         @amount = if attributes[:amount].is_a?(Common::Amount)
@@ -14,6 +14,8 @@ module Paypal
             :shipping => attributes[:shipping_amount]
           )
         end
+        @shipping_present = attributes[:shipping_amount].present?
+        @tax_present = attributes[:tax_amount].present?
         @items = []
         Array(attributes[:items]).each do |item_attrs|
           @items << Item.new(item_attrs)
@@ -46,10 +48,10 @@ module Paypal
           :"PAYMENTREQUEST_#{index}_PAYMENTREQUESTID" => self.request_id,
           :"PAYMENTREQUEST_#{index}_SELLERPAYPALACCOUNTID" => self.seller_id
         }
-        if self.amount.tax
+        if @tax_present
           params[:"PAYMENTREQUEST_#{index}_TAXAMT"] = Util.formatted_amount(self.amount.tax)
         end
-        if self.amount.shipping
+        if @shipping_present
           params[:"PAYMENTREQUEST_#{index}_SHIPPINGAMT"] = Util.formatted_amount(self.amount.shipping)
         end
         if self.billing_type
