@@ -2,6 +2,12 @@ module Paypal
   module Express
     class Request < NVP::Request
 
+      # Account
+
+      def get_merchant_id
+        self.request(:GetPalDetails)[:PAL]
+      end
+
       # Common
 
       def setup(payment_requests, return_url, cancel_url, options = {})
