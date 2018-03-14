@@ -42,7 +42,10 @@ module Paypal
       private
 
       def post(method, params)
-        RestClient.post(self.class.endpoint, common_params.merge(params).merge(:METHOD => method).to_param)
+        RestClient::Request.execute(:method      => :post, 
+                                    :url         => self.class.endpoint, 
+                                    :payload     => common_params.merge(params).merge(:METHOD => method).to_param,
+                                    :ssl_version => :TLSv1_2)
       end
 
       def handle_response
